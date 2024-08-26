@@ -29,27 +29,40 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StashClient
 {
-
-
     private final String stashBaseUrl;
     private final String stashUsername;
     private final String stashPassword;
+    private final Map<String, String> stashHeadersMap = new HashMap<>();
 
     public StashClient()
     {
         this("http://example.com", "testuser", "hunter2");
     }
 
-
-
     public StashClient(String stashBaseUrl, String username, String password)
+    {
+        this(stashBaseUrl, username, password, "");
+    }
+
+    public StashClient(String stashBaseUrl, String username, String password, String headers)
     {
         this.stashBaseUrl = stashBaseUrl;
         stashUsername = username;
         stashPassword = password;
+
+        String[] pairs = headers.split(",");
+
+        for (String pair : pairs) {
+            String[] keyValue = pair.split(":", 2);
+            if (keyValue.length == 2) {
+                stashHeadersMap.put(keyValue[0].trim(), keyValue[1].trim());
+            }
+        }
     }
 
     public String GetJsonBody(String buildState, String key, String name, String url, String description)
@@ -125,10 +138,12 @@ public class StashClient
         HttpURLConnection connection = null;
         try
         {
+            Map<String, String> additionalHeaders = GetAdditionalHeaders();
 
             Logger.LogInfo("Sending build status to " + targetURL);
             Logger.LogInfo("With body: " + body);
             Logger.LogInfo("Auth header: " + authHeader);
+            Logger.LogInfo("Additional headers: " + additionalHeaders.toString());
 
             connection = GetConnection(targetURL);
             connection.setRequestMethod("POST");
@@ -136,6 +151,8 @@ public class StashClient
 
             connection.setRequestProperty("Content-Length", String.valueOf(body.getBytes().length));
             connection.setRequestProperty("Authorization", "Basic " + authHeader);
+
+            additionalHeaders.forEach(connection::setRequestProperty);
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
@@ -236,5 +253,8 @@ public class StashClient
         return new String(Base64.encodeBase64(headerFormat.getBytes()));
     }
 
-
+    public Map<String, String> GetAdditionalHeaders()
+    {
+        return stashHeadersMap;
+    }
 }

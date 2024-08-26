@@ -15,19 +15,16 @@
 *    along with TeamCity Stash.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 package tests;
-
 
 import junit.framework.TestCase;
 import mendhak.teamcity.stash.api.StashClient;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class StashClientTest extends TestCase
 {
-
-
     public void testStashUrlConstruction_ReturnsStashUrl()
     {
         StashClient client = new StashClient();
@@ -37,7 +34,6 @@ public class StashClientTest extends TestCase
         assertEquals("http://example.com/rest/build-status/1.0/commits/12349782349", stashBuildStatusUrl);
 
     }
-
 
     public void testStashUrlConstructionWithTrailingSlash_RemovesTrailingSlash()
     {
@@ -69,11 +65,6 @@ public class StashClientTest extends TestCase
 
     }
 
-
-
-
-
-
     public void testStashBuildStateFromTeamCityBuildState()
     {
         StashClient client = new StashClient();
@@ -87,12 +78,29 @@ public class StashClientTest extends TestCase
         assertEquals("SUCCESSFUL", stashBuildState);
     }
 
-
     public void testAuthorizationHeader()
     {
         StashClient client = new StashClient();
         String authHeaderValue = client.GetAuthorizationHeaderValue("testuser","2jfksfjadf");
         assertEquals("dGVzdHVzZXI6Mmpma3NmamFkZg==", authHeaderValue);
+    }
+
+    public void testAdditionalHeaders()
+    {
+        StashClient client = new StashClient(
+                "http://example.com",
+                "testuser",
+                "hunter2",
+                "X-Header-1:value-1,X-Header-2: value2, X-Header-3: value_3"
+        );
+
+        Map<String, String> expectedHeaders = new HashMap<String, String>() {{
+            put("X-Header-1", "value-1");
+            put("X-Header-2", "value2");
+            put("X-Header-3", "value_3");
+        }};
+
+        assertEquals(expectedHeaders, client.GetAdditionalHeaders());
     }
 
     public void testBuildStatusJsonBody()
@@ -170,5 +178,4 @@ public class StashClientTest extends TestCase
         System.out.println(jsonBody);
         assertEquals(expected, jsonBody);
     }
-
 }

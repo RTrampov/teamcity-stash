@@ -49,6 +49,13 @@
     <span class="smallNote">Specify Stash password</span>
   </td>
 </tr>
+<tr>
+  <th>Additional headers:</th>
+  <td>
+    <props:textProperty name="${keys.headersKey}" className="longField"/>
+    <span class="smallNote">Specify additional comma-separated headers (e.g. X-Header-1: value1, X-Header-2: value2)</span>
+  </td>
+</tr>
 </l:settingsGroup>
 <l:settingsGroup title="Other">
 <tr>

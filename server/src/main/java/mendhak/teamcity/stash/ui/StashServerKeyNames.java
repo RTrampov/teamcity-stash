@@ -37,6 +37,11 @@ public class StashServerKeyNames
         return Constants.SECURE_PROPERTY_PREFIX + "stash_password";
     }
 
+    public String getHeadersKey()
+    {
+        return "stash_headers";
+    }
+
     public String getOnlyLatestKey()
     {
         return "stash_only_latest";
